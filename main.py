@@ -1,5 +1,10 @@
+import os
+import json
+from report import save_scan_result
 from scanner import scan_port
 from validators import validate_ip, validate_port, validate_port_range
+from services import get_service_name
+from datetime import datetime
 
 ip = input("Enter IP: ")
 
@@ -31,10 +36,19 @@ open_ports = []
 
 for port in range(start_port, end_port + 1):
     if scan_port(ip,port):
-        open_ports.append(port)
-        print(f"Port {port} is OPEN")
+        service = get_service_name(port)
+        open_ports.append({
+        "port": port,
+        "service": service
+    })
+        print(f"Port {port} is OPEN ({service})")
 
-print("Open ports:\n")
-for port in open_ports:
-    print(port)
+print("\nPORT | STATUS | SERVICE")
+
+for port_info in open_ports:
+    print(f"{port_info['port']}     OPEN     ({port_info['service']})")
+
+save_scan_result(ip,open_ports)
+
+
 
