@@ -27,7 +27,14 @@ print(f"Scanning IP: {ip} ...")
 start_port = int(start_port)
 end_port = int(end_port)
 
+open_ports = []
+
 for port in range(start_port, end_port + 1):
     if scan_port(ip,port):
+        open_ports.append(port)
         print(f"Port {port} is OPEN")
+
+print("Open ports:\n")
+for port in open_ports:
+    print(port)
 
