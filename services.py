@@ -1,4 +1,6 @@
+"""Well-known port-to-service name mappings."""
 
+# Common TCP ports and their typical services (not exhaustive)
 COMMON_SERVICES = {
     21: "FTP",
     22: "SSH",
@@ -18,5 +20,6 @@ COMMON_SERVICES = {
     8080: "HTTP-Alt"
 }
 
+# Return the service name for a port, or 'unknown' if not in the lookup table
 def get_service_name(port):
     return COMMON_SERVICES.get(port, "unknown")
