@@ -1,17 +1,16 @@
-import os
-import json
 from report import save_scan_result
-from scanner import scan_port
+from scanner import scan_ports
 from validators import validate_ip, validate_port, validate_port_range
 from services import get_service_name
-from datetime import datetime
 
+# --- Get and validate target IP ---
 ip = input("Enter IP: ")
 
 if not validate_ip(ip):
     print("Invalid IP address")
     exit()
 
+# --- Get and validate port range (must be 1–65535, start <= end) ---
 start_port = input("Start port: ")
 end_port = input("End port: ")
 
@@ -29,26 +28,32 @@ if not validate_port_range(start_port, end_port):
 
 print(f"Scanning IP: {ip} ...")
 
+# Convert to integers for range() and socket connections
 start_port = int(start_port)
 end_port = int(end_port)
 
+# Collect open ports with their associated service names
 open_ports = []
 
-for port in range(start_port, end_port + 1):
-    if scan_port(ip,port):
-        service = get_service_name(port)
-        open_ports.append({
+# range() is exclusive on the upper bound, so +1 includes end_port
+ports = range(start_port, end_port + 1)
+
+# scan_ports returns only the port numbers that responded as open
+open_port_numbers = scan_ports(ip, ports)
+
+for port in open_port_numbers:
+    service = get_service_name(port)
+    open_ports.append({
         "port": port,
         "service": service
     })
-        print(f"Port {port} is OPEN ({service})")
+    print(f"Port {port} is OPEN ({service})")
 
+# Summary table of all open ports found
 print("\nPORT | STATUS | SERVICE")
 
 for port_info in open_ports:
     print(f"{port_info['port']}     OPEN     ({port_info['service']})")
 
-save_scan_result(ip,open_ports)
-
-
-
+# Persist scan results (e.g. to a file or report)
+save_scan_result(ip, open_ports)
