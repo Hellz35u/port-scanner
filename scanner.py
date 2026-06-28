@@ -31,10 +31,11 @@ def scan_ports(ip, ports):
 
     # Thread pool speeds up large ranges; each worker runs scan_port()
     with ThreadPoolExecutor(max_workers=100) as executor:
-        futures = {
-            executor.submit(scan_port, ip, port): port
-            for port in ports
-        }
+        futures = {}
+
+        for port in ports:
+            future = executor.submit(scan_port, ip, port)
+            futures[future] = port
 
         # Process results as they finish (order may differ from input)
         for future in as_completed(futures):
